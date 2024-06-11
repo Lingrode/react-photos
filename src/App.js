@@ -13,16 +13,18 @@ const cats = [
 
 function App() {
   const [categoryId, setCategoryId] = React.useState(0);
+  const [page, setPage] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
   const [searchValue, setSearchValue] = React.useState("");
   const [collections, setCollections] = React.useState([]);
 
   React.useEffect(() => {
     setIsLoading(true);
+
+    const category = categoryId ? `category=${categoryId}` : "";
+
     fetch(
-      `https://663c26aa17145c4d8c354a8e.mockapi.io/photos?${
-        categoryId ? `category=${categoryId}` : ""
-      }`
+      `https://663c26aa17145c4d8c354a8e.mockapi.io/photos?page=${page}&limit=3&${category}`
     )
       .then((res) => res.json())
       .then((json) => {
@@ -33,7 +35,7 @@ function App() {
         alert("Error");
       })
       .finally(() => setIsLoading(false));
-  }, [categoryId]);
+  }, [categoryId, page]);
 
   return (
     <div className="App">
@@ -44,7 +46,7 @@ function App() {
             <li
               onClick={() => setCategoryId(idx)}
               className={categoryId === idx ? "active" : ""}
-              key={obj.idx}
+              key={idx}
             >
               {obj.name}
             </li>
@@ -71,9 +73,15 @@ function App() {
         )}
       </div>
       <ul className="pagination">
-        <li>1</li>
-        <li className="active">2</li>
-        <li>3</li>
+        {[...Array(3)].map((_, idx) => (
+          <li
+            key={idx}
+            className={page === idx + 1 ? "active" : ""}
+            onClick={() => setPage(idx + 1)}
+          >
+            {idx + 1}
+          </li>
+        ))}
       </ul>
     </div>
   );
