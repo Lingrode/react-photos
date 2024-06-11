@@ -4,6 +4,20 @@ import "./index.scss";
 import { Collection } from "./Collection";
 
 function App() {
+  const [collections, setCollections] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch("https://663c26aa17145c4d8c354a8e.mockapi.io/photos")
+      .then((res) => res.json())
+      .then((json) => {
+        setCollections(json);
+      })
+      .catch((err) => {
+        console.warn(err);
+        alert("Error");
+      });
+  }, []);
+
   return (
     <div className="App">
       <h1>My photo collection</h1>
@@ -18,15 +32,9 @@ function App() {
         <input className="search-input" placeholder="Search by name" />
       </div>
       <div className="content">
-        <Collection
-          name="Travel the world"
-          images={[
-            "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-            "https://images.unsplash.com/photo-1560840067-ddcaeb7831d2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDB8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-            "https://images.unsplash.com/photo-1531219572328-a0171b4448a3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mzl8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-            "https://images.unsplash.com/photo-1573108724029-4c46571d6490?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzR8fGNpdHl8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-          ]}
-        />
+        {collections.map((obj, idx) => (
+          <Collection key={idx} name={obj.name} images={obj.photos} />
+        ))}
       </div>
       <ul className="pagination">
         <li>1</li>
