@@ -3,12 +3,27 @@ import "./index.scss";
 
 import { Collection } from "./Collection";
 
+const cats = [
+  { name: "All" },
+  { name: "Sea" },
+  { name: "Mountains" },
+  { name: "Architecture" },
+  { name: "Cities" },
+];
+
 function App() {
+  const [categoryId, setCategoryId] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [searchValue, setSearchValue] = React.useState("");
   const [collections, setCollections] = React.useState([]);
 
   React.useEffect(() => {
-    fetch("https://663c26aa17145c4d8c354a8e.mockapi.io/photos")
+    setIsLoading(true);
+    fetch(
+      `https://663c26aa17145c4d8c354a8e.mockapi.io/photos?${
+        categoryId ? `category=${categoryId}` : ""
+      }`
+    )
       .then((res) => res.json())
       .then((json) => {
         setCollections(json);
@@ -16,19 +31,24 @@ function App() {
       .catch((err) => {
         console.warn(err);
         alert("Error");
-      });
-  }, []);
+      })
+      .finally(() => setIsLoading(false));
+  }, [categoryId]);
 
   return (
     <div className="App">
       <h1>My photo collection</h1>
       <div className="top">
         <ul className="tags">
-          <li className="active">All</li>
-          <li>Mountains</li>
-          <li>Sea</li>
-          <li>Architecture</li>
-          <li>Cities</li>
+          {cats.map((obj, idx) => (
+            <li
+              onClick={() => setCategoryId(idx)}
+              className={categoryId === idx ? "active" : ""}
+              key={obj.idx}
+            >
+              {obj.name}
+            </li>
+          ))}
         </ul>
         <input
           value={searchValue}
@@ -38,13 +58,17 @@ function App() {
         />
       </div>
       <div className="content">
-        {collections
-          .filter((obj) =>
-            obj.name.toLowerCase().includes(searchValue.toLowerCase())
-          )
-          .map((obj, idx) => (
-            <Collection key={idx} name={obj.name} images={obj.photos} />
-          ))}
+        {isLoading ? (
+          <h2>Loading...</h2>
+        ) : (
+          collections
+            .filter((obj) =>
+              obj.name.toLowerCase().includes(searchValue.toLowerCase())
+            )
+            .map((obj, idx) => (
+              <Collection key={idx} name={obj.name} images={obj.photos} />
+            ))
+        )}
       </div>
       <ul className="pagination">
         <li>1</li>
